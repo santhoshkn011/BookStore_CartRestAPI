@@ -38,6 +38,13 @@ public class CartController {
         ResponseDTO responseDTO = new ResponseDTO("Cart Details with Cart ID: "+cartId, cartDetails);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
+
+    //Get Cart Data by CartId(MicroService)
+    @GetMapping("/Data/{cartId}")
+    public Cart getCartDataByCartID(@PathVariable Long cartId){
+        Cart cartDetails = cartService.getCartDataByCartId(cartId);
+        return cartDetails;
+    }
     //Get Cart Data by UserId
     @GetMapping("/UserCart/{userId}")
     public ResponseEntity<ResponseDTO> getCartDataByUserID(@PathVariable Long userId){

@@ -20,4 +20,6 @@ public interface ICartService {
     String editCartByCartId(Long cartId, CartDTO cartDTO);
 
     String deleteCartByCartId(Long userId, Long cartId);
+
+    Cart getCartDataByCartId(Long cartId);
 }

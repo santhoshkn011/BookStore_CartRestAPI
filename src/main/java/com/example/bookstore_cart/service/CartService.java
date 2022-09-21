@@ -29,6 +29,7 @@ public class CartService implements ICartService{
     TokenUtility tokenUtility;
     @Autowired
     private RestTemplate restTemplate;
+    //Add Cart details
     @Override
     public Cart addCartData(CartDTO cartDTO) {
         ResponseEntity<UserDataDTO> userDetails = restTemplate.getForEntity(USER_URI+cartDTO.getUserId(), UserDataDTO.class);
@@ -43,13 +44,16 @@ public class CartService implements ICartService{
         ResponseEntity<BookDataDTO> bookDetails = restTemplate.getForEntity(BOOK_URI+cartDTO.getBookId(), BookDataDTO.class);
         System.out.println(bookDetails.getBody());
         if (userDetails.hasBody() && bookDetails.hasBody()) {
-            Cart cartDetails = new Cart(cartDTO);
-            return cartRepo.save(cartDetails);
+            if(cartDTO.getQuantity()<=bookDetails.getBody().getQuantity()){
+                Cart cartDetails = new Cart(cartDTO);
+                return cartRepo.save(cartDetails);
+            }else
+                throw new CartException("Quantity Exceeds, Available Book Quantity: "+bookDetails.getBody().getQuantity());
         } else {
             throw new CartException("Invalid User Id | Book Id");
         }
     }
-
+    //Get all Cart lists
     @Override
     public List<Cart> allCartList() {
         List<Cart> cartList = cartRepo.findAll();
@@ -58,7 +62,7 @@ public class CartService implements ICartService{
         }else
             return cartList;
     }
-
+    //Get cart details by cart Id
     @Override
     public Cart getCartDetailsByCartId(Long cartId) {
         Optional<Cart> cartDetails = cartRepo.findById(cartId);
@@ -67,7 +71,7 @@ public class CartService implements ICartService{
         }else
             throw new CartException("Cart ID does not exist: Invalid ID");
     }
-    //MicroService
+    // Get cart details by cart Id (MicroService)
     @Override
     public Cart getCartDataByCartId(Long cartId) {
         Optional<Cart> cartDetails = cartRepo.findById(cartId);
@@ -76,7 +80,7 @@ public class CartService implements ICartService{
         }else
             return null;
     }
-
+    //Get cart details by User Id
     @Override
     public List<Cart> getCartDetailsByUserId(Long userId) {
         ResponseEntity<UserDataDTO> userDetails = restTemplate.getForEntity(USER_URI+userId, UserDataDTO.class);
@@ -89,7 +93,7 @@ public class CartService implements ICartService{
         }else
             throw new CartException("User ID not found");
     }
-
+    //Get cart details by Token
     @Override
     public List<Cart> getCartDetailsByToken(String token) {
         ResponseEntity<UserDataDTO> userDetails = restTemplate.getForEntity(USER_Token_URI+token, UserDataDTO.class);
@@ -103,7 +107,7 @@ public class CartService implements ICartService{
         }else
             throw new CartException("User ID Does not found!!!!");
     }
-
+    //Edit cart details
     @Override
     public String editCartByCartId(Long cartId, CartDTO cartDTO) {
         ResponseEntity<UserDataDTO> userDetails = restTemplate.getForEntity(USER_URI+cartDTO.getUserId(), UserDataDTO.class);
@@ -111,16 +115,19 @@ public class CartService implements ICartService{
         ResponseEntity<Cart> cartDetails = restTemplate.getForEntity(CART_URI+cartId, Cart.class);
         if(userDetails.hasBody() && cartDetails.hasBody() && bookDetails.hasBody()){
                 if(userDetails.getBody().getUserId().equals(cartDetails.getBody().getUserId())){
-                    cartDetails.getBody().setBookId(cartDTO.getBookId());
-                    cartDetails.getBody().setQuantity(cartDTO.getQuantity());
-                    cartRepo.save(cartDetails.getBody());
-                    return "Cart Details Updated! with Book ID: "+cartDTO.getBookId()+", Quantity: "+cartDTO.getQuantity();
+                    if(cartDTO.getQuantity()<=bookDetails.getBody().getQuantity()){
+                        cartDetails.getBody().setBookId(cartDTO.getBookId());
+                        cartDetails.getBody().setQuantity(cartDTO.getQuantity());
+                        cartRepo.save(cartDetails.getBody());
+                        return "Cart Details Updated! with Book ID: "+cartDTO.getBookId()+", Quantity: "+cartDTO.getQuantity();
+                    }else
+                        throw new CartException("Quantity Exceeds, Available Book Quantity: "+bookDetails.getBody().getQuantity());
                 }else
                     throw new CartException("Cart ID does not match for the User ID: "+cartDTO.getUserId());
         }else
             throw new CartException("Invalid User ID | book ID | Cart ID");
     }
-
+    //delete cart details
     @Override
     public String deleteCartByCartId(Long userId, Long cartId) {
         ResponseEntity<UserDataDTO> userDetails = restTemplate.getForEntity(USER_URI+userId, UserDataDTO.class);

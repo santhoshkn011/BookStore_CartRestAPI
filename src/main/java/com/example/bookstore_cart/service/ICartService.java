@@ -3,6 +3,7 @@ package com.example.bookstore_cart.service;
 import com.example.bookstore_cart.dto.CartDTO;
 import com.example.bookstore_cart.model.Cart;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 public interface ICartService {

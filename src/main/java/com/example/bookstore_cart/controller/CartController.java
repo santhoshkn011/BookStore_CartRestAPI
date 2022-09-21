@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,7 @@ public class CartController {
     ICartService cartService;
     //Add Cart Details to the UserID
     @PostMapping("/insert")
-    public ResponseEntity<ResponseDTO> addCartDetails(@RequestBody CartDTO cartDTO){
+    public ResponseEntity<ResponseDTO> addCartDetails(@RequestBody CartDTO cartDTO) {
         Cart cartDetails = cartService.addCartData(cartDTO);
         ResponseDTO responseDTO = new ResponseDTO("Cart Details Added", cartDetails);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -41,7 +42,7 @@ public class CartController {
     @GetMapping("/UserCart/{userId}")
     public ResponseEntity<ResponseDTO> getCartDataByUserID(@PathVariable Long userId){
         List<Cart> userCartDetails = cartService.getCartDetailsByUserId(userId);
-        ResponseDTO responseDTO = new ResponseDTO("Cart Details with User ID: "+userId, userCartDetails);
+        ResponseDTO responseDTO = new ResponseDTO("Cart Details with UserData ID: "+userId, userCartDetails);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
     //Get Cart Data by Token

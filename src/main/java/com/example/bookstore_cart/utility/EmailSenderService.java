@@ -17,6 +17,6 @@ public class EmailSenderService {
         message.setText(body);
         message.setSubject(subject);
         mailSender.send(message);
-        System.out.println("e-mail sent to the User...!");
+        System.out.println("e-mail sent to the UserData...!");
     }
 }
